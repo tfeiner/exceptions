@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Exceptions</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section>
+            <h1>Exceptions</h1>
+            <!--<h3>The HTML Presentation Framework</h3>-->
+            <p>
+                Thomas Feiner
+            </p>
+
+
+        </section>
+
+        <!-- Example of nested vertical slides -->
+        <section>
+            <section>
+                <h2>Short recap</h2>
+            </section>
+
+            <section>
+                <h2>Short recap</h2>
+
+                <p>try / catch / finally</p>
+
+                <pre><code class="hljs" data-trim contenteditable>
+try {
+    body
+} catch (exception-classname variable-name) {
+    handler
+} finally {
+    finally code
+}
+                </code></pre>
+
+                <br>
+            </section>
+            <section>
+                <h2>Short recap</h2>
+
+                <p>The code inside a finally block will always be executed, even if an exception is thrown within the
+                try or catch block. When the code has a return statement within try or catch block, the code inside the
+                finally block will get executed before returning from the method.
+            </section>
+            <section>
+                <h2>Short recap</h2>
+                <pre><code>
+public class TestMyTest {
+
+    @Test
+    public void finallyTest() {
+        int value = finallyMethod();
+        assertEquals(??, value);
+    }
+
+    private int finallyMethod() {
+        try {
+           return 0;
+        } finally {
+           return 1;
+        }
+    }
+}
+               </code></pre>
+            </section>
+
+            <section>
+                <h2>try with resources</h2>
+
+                <pre><code>
+InputStream in = getSystemResourceAsStream("test.txt" );
+try (Scanner res = new Scanner( in )) {
+    System.out.println(res.nextLine());
+}
+                </code></pre>
+<p>instead of</p>
+                <pre><code>
+InputStream in = getSystemResourceAsStream("test.txt" );
+final Scanner res = new Scanner( file );
+try {
+    System.out.println(res.nextLine());
+} finally {
+    res.close();
+}
+                </code></pre>
+            <p>If close() throws a checked exception, you have to handle it.</p>
+
+            </section>
+        </section>
+
+        <section>
+            <h2>Hierarchy</h2>
+
+            <img src="./img/hierarchy.png">
+
+        </section>
+
+        <section>
+            <section>
+            <h2>Checked or Unchecked Exceptions</h2>
+            </section>
+
+            <section>
+                <h2>Checked exceptions</h2>
+
+                <p>
+                    must be caught or declared thrown and extend java.lang.Exception
+                </p>
+            </section>
+
+            <section>
+                <h2>Unchecked exceptions</h2>
+
+                <p>
+                    do not have to be caught or declared thrown and extend java.lang.RuntimeException
+                </p>
+            </section>
+
+            <section>
+                <h2>Pro Checked Exceptions</h2>
+
+                <p>
+                <ul>
+                    <li>it is harder to forget handling exceptions</li>
+                    <li>when methods do not declare which unchecked exceptions they may throw
+                    it is hard to handle them</li>
+                </ul>
+                </p>
+            </section>
+
+            <section>
+                <h2>Pro Unchecked Exceptions</h2>
+
+                <p>
+                <ul>
+                    <li>checked exceptions clutter top level methods (violates the open/closed principle)</li>
+                    <li>checked exceptions are part of the signature or interface, it is hard to remove them later</li>
+                    <li>when programmer KNOWS that all preconditions are met, he is not forced to clutter code with try/catch</li>
+                </ul>
+                </p>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>Error situations</h2>
+            </section>
+
+            <section>
+                <h2>Client errors</h2>
+
+                <p>Caused by clients of a system, e.g. web client sends invalid web service request.</p>
+            </section>
+
+            <section>
+                <h2>Service errors</h2>
+
+                <p>External or internal service does not work properly, e.g. DB is down.</p>
+            </section>
+
+            <section>
+                <h2>Internal errors</h2>
+
+                <p>Malfunction of the system, not detected by tests, dicovered during runtime. The
+                error needs to be investigated and the application fixed and redeployed.</p>
+            </section>
+
+            <section>
+                <h2>System errors</h2>
+
+                <p>Serious and unrecoverable problems with the JVM. The application has to shut down immediately.
+                </p>
+
+                <p style="color:red">java.lang.Error, subclass of java.lang.Throwable<br/>NEVER catch Error or Throwable!
+                </p>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>Principles</h2>
+
+                <ul>
+                    <li>Exception handling design according to application design</li>
+                    <li>Exception hierarchy should reflect application's component hierarchy</li>
+                    <li>Exception handling is more than error handling</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Throwing exceptions</h2>
+
+                <ul>
+                    <li>Assertions and preconditions at the beginning of crucial methods. (should throw IllegalArgumentException)</li>
+                    <li>Add context information to Exception if possible</li>
+                    <li>Avoid differentiating by error text messages. Use context information or exception subclasses instead</li>
+                </ul>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h2>Exception handling antipatterns</h2>
+            </section>
+
+            <section>
+                <h2>Do not use exceptions for flow control!</h2>
+            </section>
+
+            <section>
+                <h2>Logging</h2>
+
+                <ul>
+                    <li>Logging a stacktrace where it is not needed</li>
+                    <li>Mix logging and propagation (log and rethrow)</li>
+                    <pre><code>
+catch (final NoSuchMethodException e) {
+    LOG.error("error", e);
+    throw e;
+}
+
+catch (final NoSuchMethodException e) {
+    LOG.error("error", e);
+    throw new MyAwesomeException(e);
+}
+                    </code></pre>
+                </ul>
+            </section>
+
+
+            <section>
+                <h2>Finally</h2>
+
+                <ul>
+                    <li>Forgot to use finally where it is appropriate</li>
+                    <li>Throw within finally, overrides the originally thrown exception without any trace</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Swallow exceptions</h2>
+
+               <pre><code>
+try {
+    foo();
+} catch (final Exception e) {
+    //something happened
+    return null; // I have seen something with "return 0" for DB counts :)
+}
+               </code></pre>
+            </section>
+            <section>
+               <h2>Throwing Exception</h2>
+
+               <pre><code>
+public void foo() throws Exception
+               </code></pre>
+
+            </section>
+            <section>
+                <h2>Catch java.lang.Exception</h2>
+
+               <pre><code>
+try {
+    foo();
+} catch (final Exception e) {  //also catches checked exceptions!
+    LOG.error("foo failed", e);
+}
+               </code></pre>
+
+            </section>
+
+            <section><h2>Catch Throwable</h2>
+               <pre><code>
+try {
+    foo();
+} catch (final Throwable t) {  //also catches checked exceptions!
+    //wait ... what?
+}
+               </code></pre>
+            </section>
+
+            <section><h2>Throw the kitchen sink</h2>
+               <pre><code>
+public void foo throws MyException, AnotherException, SomeOtherException, YetAnotherException { ... }
+               </code></pre>
+            </section>
+
+            <section><h2>Destructive wrapping</h2>
+               <pre><code>
+catch (NoSuchMethodException e) {
+    throw new MyServiceException("something went wrong" + e.getMessage); //stacktrace is lost!
+}
+               </code></pre>
+            </section>
+
+            <section><h2>Log and return null</h2>
+               <pre><code>
+catch (NoSuchMethodException e) {
+    LOG.error("something happened", e);
+    return null;
+}
+               </code></pre>
+            </section>
+
+            <section><h2>Relying on getCause()</h2>
+               <pre><code>
+catch (MyException e) {
+    if (e.getCause() instanceof FooException) {
+    ...
+    }
+}
+               </code></pre>
+        </section>
+
+        <section><h2>Unsupported operation returning null</h2>
+           <pre><code>
+public String foo() {
+   // Not supported in this implementation.
+   return null;
+}
+           </code></pre>
+        </section>
+
+
+        </section>
+
+        <section>
+            <h2>Three rules</h2>
+
+            <ul>
+                <li>Be specific <br/>create exception hierarchy</li>
+                <li>Throw early <br/>(e.g. prohibit NPE and give context with specific exception</li>
+                <li>Catch late <br/>catch exceptions at the proper layer, where your program can either meaningfully recover from the exception and continue without causing further errors, or provide the user with specific information</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Debate</h2>
+
+            <p>http://stackoverflow.com/questions/613954/the-case-against-checked-exceptions</p>
+            <p>http://mikehadlow.blogspot.co.at/2009/08/first-rule-of-exception-handling-do-not.html</p>
+            <p>http://blogs.atlassian.com/2011/05/exceptions_are_bad/</p>
+            <p>http://tapestryjava.blogspot.in/2011/05/tragedy-of-checked-exceptions.html</p>
+        </section>
+
+        <section>
+            <h2>Thank you for your attention!</h2>
+			<small>Sources: <br />
+                Presentation by Peter Nagy (https://prezi.com/fmcp-mnimush/exception-handling-in-java-part-1)<br/>
+                Effective Java 2nd Edition, Joshua Bloch <br/>
+                Clean Code, Robert C. Martin <br/>
+                Oracle Community (https://community.oracle.com/docs/DOC-983543#catchingException) <br/>
+                http://www.onjava.com/pub/a/onjava/2003/11/19/exceptions.html
+            </small>
+        </section>
+
+    </div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // Full list of configuration options available at:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true}
+        ]
+    });
+
+</script>
+
+</body>
+</html>
